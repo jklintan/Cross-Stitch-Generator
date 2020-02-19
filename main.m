@@ -1,6 +1,10 @@
 %% Main
-% Function that generates a cross stitch pattern from an 
+% Function that generates a cross stitch pattern from an
 % input image. Gives the correct colors to buy for yarn.
+
+%% Clear
+
+clc; clear all; close all;
 
 %% Read in from database, save to .mat and load
 
@@ -10,134 +14,239 @@ load('DMCtoRGB.mat');
 
 %% Store information
 
-DMC = DMCtoRGB.Floss(1:453);
-NAME = DMCtoRGB.Description(1:453);
 RGB = DMCtoRGB(1:453,3:5);
 
 [n ~] = size(DMCtoRGB);
 LAB = zeros(n-1);
-for i = 1:numel(RGB)
-    LAB = rgb2lab([RGB.Red, RGB.Green, RGB.Blue]);
+for i = 1:453
+    LAB(:,1:3) = rgb2lab([RGB.Red, RGB.Green, RGB.Blue]);
+    LAB(i, 4) = i;
 end
+
+LAB = LAB(:,1:4);
+plot3(LAB(:, 2), LAB(:, 3), LAB(:,1), 'r.')
+grid on
+title('All DMC colors in Lab color space')
+xlabel('a value'); ylabel('b value'); zlabel('L value')
 
 %% Load input image
 
-im = imread('me.jpg');
-[w, h] = size(im);
+im = imread('mtdoom.jpg');
+h = size(im, 1);
+w = size(im, 2);
 im = im2double(im);
 
-% 20x20px
+% 1080x720 (common aspect ratio for cameras)
 
-H = 1000;
-W = 640;
+DIM = 10; % Set to 10 or 20 for user to choose
+THICKNESS = 1; % Thickness 3 for DIM = 20, 1 for DIM = 10;
+H = 1080;
+W = 720;
+COLORS = 100;
 
+%%
 typeIm = 0;% 1 = portrait, 2 = landscape, 3 = square
 
-if(h > w) %Portrait
-    im_resize = imresize(im, [1000, 640]);
-    if(640 > h)
-        disp("Image too small, resizing");
-    else
-        disp("Image too large, resizing");
-    end
+% Check if image is large enough
+if(h < 200 || w < 200)
+    disp("Input image is too small, choose a larger image");
+    return;
 end
 
-imshow(im_resize);
-
-%if(w > h) %Landscape
-%end
-
-
-%%
-        k = 1;
-        for i = 1:20:H
-            for j = 1:20:W
-                
-                   vectY = i:i+20-1;
-                   vectX = j:j+20-1;
-                   
-                 meanIntensity(k,1) =  floor(mean2(im_resize(vectY,vectX,1))*255);
-                 meanIntensity(k,2) =  floor(mean2(im_resize(vectY,vectX,2))*255);
-                 meanIntensity(k,3) =  floor(mean2(im_resize(vectY,vectX,3))*255);
-
-                 k = k+1;
-            end
-              
-        end
-
-%% Generate cross stitch
-
-pixelsumR = 0;
-pixelsumG = 0;
-pixelsumB = 0;
-n = 1;
-for i = 1:19:H-19
-    for j = 1:19:W-19  
-        pixelsumR(n) = sum(sum(im_resize(i:i+19,j:j+19,1)))./(20*20);
-        pixelsumG(n) = sum(sum(im_resize(i:i+19,j:j+19,2)))./(20*20);
-        pixelsumB(n) = sum(sum(im_resize(i:i+19,j:j+19,3)))./(20*20);
-        n = n + 1;
+% Resize image
+if(h > w) %Portrait image
+    disp("Portrait image");
+    if(h < H - 100 || w < W - 100)
+        disp("Input image is being enlarged, may suffer from pixelrelated distortions");
     end
-end
-
-
-%% 
-
-finalimage = zeros(1000, 640);
-
-stitches = {};
-for i = 1:20
-    ind = randi(sort([1 453]),1,1);
-    stitch = generateSingleStitch(DMCtoRGB.Red(ind), DMCtoRGB.Green(ind), DMCtoRGB.Blue(ind), 20, 3);
-    stitches{i} = stitch;
     
-    %imshow(stitch);
-    rgbs(i, 1:3) = [DMCtoRGB.Red(ind), DMCtoRGB.Green(ind), DMCtoRGB.Blue(ind)];
-    comp(i, 1:3) = [pixelsumR(ind), pixelsumG(ind), pixelsumB(ind)];
-    %labs(i) = rgb2lab(DMCtoRGB.Red(ind), DMCtoRGB.Green(ind), DMCtoRGB.Blue(ind));
+    if(h > H + 100 || w > W + 100)
+        disp("Input image is being shrunk");
+    end
+    
+    portrait = 1;
+    im_resize = imresize(im, [H, W], 'bicubic');
+    
+elseif(h < w) % Landscape image
+    temp = H;
+    H = W;
+    W = temp;
+    
+    disp("Landscape image");
+    if(h < H - 100 || w < W - 100)
+        disp("Input image is being enlarged, may suffer from pixelrelated distortions");
+    end
+    
+    if(h > H + 100 || w > W + 100)
+        disp("Input image is being shrunk");
+    end
+    
+    landscape = 1;
+    im_resize = imresize(im, [H, W], 'bicubic');
+else %Square image
+    H = W;
+    
+    disp("Square image");
+    if(h < H - 100 || w < W - 100)
+        disp("Input image is being enlarged, may suffer from pixelrelated distortions");
+    end
+    
+    if(h > H + 100 || w > W + 100)
+        disp("Input image is being shrunk");
+    end
+    
+    im_resize = imresize(im, [H, W], 'bicubic');
+end
+
+%imshow(im_resize);
+
+%% Calculate mean intensity
+
+%Calculate mean intensity of image and turn to RGB values
+meanIntensity = floor(meanintensity(im_resize,DIM)*255);
+
+
+%% Choose 100 colors to cover color space
+
+colors100 = zeros(100, 1);
+k = 1;
+for i = 1:size(RGB)
+    col1 = LAB(i, 1:4);
+    if(k >= 1 & k < 5) % Make sure to get some red values
+        colors100(k) = LAB(k, 4);
+        k = k + 1;
+        continue;
+    end
+    for j = i+1:size(RGB)
+        dist = euclidianDistance(col1(1:3), LAB(j, 1:3));
+        if(dist > 10*10^3)
+            if(ismember(colors100, LAB(j, 4)) == 0)
+                colors100(k) = LAB(j, 4);
+                k = k + 1;
+                break;
+            end
+        end
+    end
+    if(k == 101)
+        break;
+    end
+end
+
+for i = 1:100
+    disp(DMCtoRGB.Description(colors100(i)))
+end
+
+%% Choose 50 colors out of 100
+
+colors50 = zeros(50, 1);
+k = 1;
+for i = 1:100
+    col1 = LAB(colors100(i), 1:3);
+    if(k >= 1 & k < 5) % Make sure to get some red values
+        colors50(k) = LAB(colors100(k), 4);
+        k = k + 1;
+        continue;
+    end
+    for j = i+1:100
+        distaaaan = euclidianDistance(col1, LAB(colors100(j), 1:3));
+        if(distaaaan > 9*10^3)
+            if(ismember(colors50, LAB(colors100(j), 4)) == 0)
+                colors50(k) = LAB(colors100(j), 4);
+                k = k + 1;
+                break;
+            end
+        end
+    end
+    if(k == 51)
+        break;
+    end
+end
+
+for i = 1:50
+    disp(DMCtoRGB.Description(colors50(i)))
+end
+
+
+%% Choose only the most occuring colors in the image
+
+clear occuring;
+d = zeros(size(RGB, 1));
+u = 1;
+for i = 1:size(meanIntensity)
+    d(i, 1) = sqrt(meanIntensity(i,1).^2 + meanIntensity(i,2).^2 + meanIntensity(i,3).^2);
+    if(i == 1)
+        occuring(1) = d(i, 1);
+    else
+        existSimilar = 0;
+        for j = 1:size(occuring)
+            if(abs(d(i, 1) - occuring(j)) < 0.2)
+                existSimilar = 1;
+                existSimilar;
+            end
+        end
+        
+        if(existSimilar == 0)
+            occuring(u, 1) = d(i, 1);
+            occuring(u, 2) = i;
+            u = u+1;
+        end
+    end
+    
+end
+
+
+occuring = sort(occuring);
+mostOccuring = occuring(1:800, 1:2)
+mostOccuring(:,2)
+
+minimum = 100000;
+save = 1;
+chooseThiscol = zeros(100, 1);
+breakit = 0;
+for n = 1:100
+    curr = rgb2lab(meanIntensity(occuring(n, 2), 1:3));
+    for i = 1:453
+        diss = sqrt((LAB(i, 1)-curr(1)).^2 + (LAB(i, 2)-curr(2)).^2 + (LAB(i, 3)-curr(3)).^2);
+        if(diss < minimum & ismember(chooseThiscol, i) == 0)
+            minimum = diss;
+            save = i
+            chooseThiscol(n) = save;
+            breakit = 1;
+            break;
+        end
+    end
+    minimum = 900;
+            if(breakit == 1)
+                breakit = 0;
+            continue;
+        end
+    
+end
+
+chooseThiscol = sort(chooseThiscol, 'ascend');
+k = 1;
+for i = 1:100
+    if(chooseThiscol(i) ~= 0)
+        final(k) = chooseThiscol(i);
+        k = k +1;
+    end
 end
 
 %%
 
-%generateSingleStitch(RGB.Red(index), RGB.Green(index), RGB.Blue(index), 20, 2);
-k = 1;
-distancesArr = zeros(numel(LAB));
-threads = 1;
-labscomp = rgb2lab(meanIntensity(:, 1:3));
-buyFloss = 0;
-buythis = "";
-for i = 1:20:1000
-    for j = 1:20:640
-        in = floor(j/20 + 32*i/20);
-        curr = rgb2lab(meanIntensity(in, 1:3));
-        
-        minimum = 10000000;
-        save = 1;
-        for n = 1:400
-            diss = sqrt((LAB(n, 1)-curr(1)).^2 + (LAB(n, 2)-curr(2)).^2 + (LAB(n, 3)-curr(3)).^2);
-            if(diss < minimum)
-                minimum = diss;
-                save = n;
-            end
-            %distancesArr(n) = sqrt((LAB(n, 1)-curr(1)).^2 + (LAB(n, 2)-curr(2)).^2 + (LAB(n, 3)-curr(3)).^2);
-        end
-        
-        %[a, b] = min(distancesArr);
-        chooseThiscol = save;
-        finalimage(i:i+19, j:j+19, 1:3) = generateSingleStitch(DMCtoRGB.Red(chooseThiscol), DMCtoRGB.Green(chooseThiscol), DMCtoRGB.Blue(chooseThiscol), 20, 3);
+final = sort(final(1:49))';
+[finalimage, buythis, buyFloss] = generateCrossStitchMosaic(H, W, meanIntensity, final, LAB, DIM, THICKNESS);
+figure; imshow(finalimage);
 
-        if(ismember(DMCtoRGB.Floss(chooseThiscol), buyFloss))
-            %disp("Exist");
-        else
-            buythis(threads) = DMCtoRGB.Description(chooseThiscol);
-            buyFloss(threads) = DMCtoRGB.Floss(chooseThiscol);
-            threads = threads + 1;
-        end
-       
-    end
-end
+%% Create cross stitch mosaic
 
-imshow(finalimage);
+allDMC = [1:size(RGB)]';
+
+%[finalimage, buythis, buyFloss] = generateCrossStitchMosaic(H, W, meanIntensity, allDMC, LAB, DIM, THICKNESS);
+%[finalimage, buythis, buyFloss] = generateCrossStitchMosaic(H, W, meanIntensity, colors100, LAB, DIM, THICKNESS);
+[finalimage, buythis, buyFloss] = generateCrossStitchMosaic(H, W, meanIntensity, colors50, LAB, DIM, THICKNESS);
+
+figure; imshow(finalimage);
 
 
 %% Output to user
@@ -149,13 +258,18 @@ DMC = buyFloss(:);
 T = table(ColorName, DMC);
 disp(T);
 
-finalim = ones(1120, 760, 3);
-finalim(61:1060, 61:700, 1:3) = finalimage;
-imshow(finalim);
 
+%% Calculate measurements
 
-%image = generateSingleStitch(55, 204, 78, 50, 8);
-%imshow(image);
+% Signal to noise ratio
+snr_dist = snr(im_resize, im_resize-finalimage)
 
-%Minst 200-300px på originalbild
-%Generera en array innan med LAB värdena
+% SSIM - structural similarity
+% a perceptual metric that quantifies image quality degradation caused by processing
+[SSIMval, SSIM] = ssim(im_resize, finalimage);
+
+% Euclidian distance
+imLab = rgb2lab(im_resize);
+crossLab = rgb2lab(finalimage);
+dE = sqrt((crossLab(:,:,1)-imLab(:,:,1)).^2 + (crossLab(:,:,2)-imLab(:,:,2)).^2 + (crossLab(:,:,3)-imLab(:,:,3)).^2);
+dE = (1/(W*H))*sum(sum(dE));

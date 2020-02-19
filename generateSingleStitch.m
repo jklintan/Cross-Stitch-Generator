@@ -2,7 +2,7 @@ function stitchIm = generateSingleStitch(r, g, b, dim, t)
 %GENERATESINGLESTITCH Generates an image of a cross stitch
 % with color rgb and dimensions dim. Thickness factor t.
 
-width = 3;
+width = 2;
 
 im = zeros(dim, dim, 3);
 numbCol = width;
