@@ -1,6 +1,6 @@
 function [outputImage,threadCols, threadDescription] = generateCrossStitchMosaic(height, width, meanIntensity, colorindex, LABvector, DIM, THICKNESS)
-%GENERATECROSSSTITCHMOSAIC Summary of this function goes here
-%   Detailed explanation goes here
+%GENERATECROSSSTITCHMOSAIC Create a reproduction of an image with cross
+%stitches
 
 load('DMCtoRGB.mat');
 H = height;
