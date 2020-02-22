@@ -9,9 +9,13 @@ Requires image processing toolbox.
 
 The following images has been generated with a cross stitch width of 10x10 pixels. 
 
-## Monet Cliff walk
+## Monet, Cliff walk
 
 <img width="100%" src="./img/monet2.jpg"/>
+
+## Salvador Dali, Persistence of memory
+
+<img width="100%" src="./img/persistenceStitch.jpg"/>
 
 ## Illustration
 
