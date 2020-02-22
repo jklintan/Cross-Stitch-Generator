@@ -17,6 +17,10 @@ The following images has been generated with a cross stitch width of 10x10 pixel
 
 <img width="100%" src="./img/persistenceStitch.jpg"/>
 
+## Disgust from Inside Out
+
+<img width="100%" src="./img/disgustStitch.jpg"/>
+
 ## Illustration
 
 <img width="100%" src="./img/Fist50_opt.png"/>
