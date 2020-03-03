@@ -39,7 +39,7 @@ for i = 1:DIM:H
         % Generate the cross stitch
         finalimage(i:i+DIM-1, j:j+DIM-1, 1:3) = generateSingleStitch(DMCtoRGB.Red(chooseThiscol), DMCtoRGB.Green(chooseThiscol), DMCtoRGB.Blue(chooseThiscol), DIM, THICKNESS);
         
-        if(ismember(DMCtoRGB.Floss(chooseThiscol), buyFloss))
+        if(ismember(DMCtoRGB.Floss(chooseThiscol), buyFloss) || isnan(DMCtoRGB.Floss(chooseThiscol)))
             %disp("Exist");
         else
             buythis(threads) = DMCtoRGB.Description(chooseThiscol);

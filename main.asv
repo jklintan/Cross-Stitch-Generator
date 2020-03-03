@@ -29,7 +29,7 @@ load('LAB.mat');
 
 %% Load input image
 
-im = imread('./input/mtdoom.jpg');
+im = imread('legionen.jpg');
 h = size(im, 1);
 w = size(im, 2);
 im = im2double(im);
@@ -63,11 +63,9 @@ load('colors100.mat');
 
 %% Choose 50 less
 
-colors50_v2 = [];
-k = 1;
+col50 = []
 for i = 1:2:100
-    col50_v2(k, 1) = colors100(i, 1);
-    k = k + 1;
+    col[i]
 end
 
 %% Choose 50 colors out of 100
@@ -97,11 +95,6 @@ displayEmbroideryColors(buythis, buyFloss);
 
 [finalimage50, buythis, buyFloss] = generateCrossStitchMosaic(H, W, meanIntensity, colors50, LAB, DIM, THICKNESS);
 figure; imshow(finalimage50);
-displayEmbroideryColors(buythis, buyFloss);
-
-
-[finalimage50_v2, buythis, buyFloss] = generateCrossStitchMosaic(H, W, meanIntensity, col50_v2, LAB, DIM, THICKNESS);
-figure; imshow(finalimage50_v2);
 displayEmbroideryColors(buythis, buyFloss);
 
 %% Display image with 50 most occuring colors as database
@@ -140,10 +133,6 @@ dE_100 = (1/(W*H))*sum(sum(dE_100))
 crossLab = rgb2lab(finalimage50);
 dE_50 = sqrt((crossLab(:,:,1)-imLab(:,:,1)).^2 + (crossLab(:,:,2)-imLab(:,:,2)).^2 + (crossLab(:,:,3)-imLab(:,:,3)).^2);
 dE_50 = (1/(W*H))*sum(sum(dE_50))
-
-crossLab = rgb2lab(finalimage50_v2);
-dE_50_v2 = sqrt((crossLab(:,:,1)-imLab(:,:,1)).^2 + (crossLab(:,:,2)-imLab(:,:,2)).^2 + (crossLab(:,:,3)-imLab(:,:,3)).^2);
-dE_50_v2 = (1/(W*H))*sum(sum(dE_50_v2))
 
 crossLab = rgb2lab(finalimage50opt);
 dE_50opt = sqrt((crossLab(:,:,1)-imLab(:,:,1)).^2 + (crossLab(:,:,2)-imLab(:,:,2)).^2 + (crossLab(:,:,3)-imLab(:,:,3)).^2);
