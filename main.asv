@@ -29,7 +29,7 @@ load('LAB.mat');
 
 %% Load input image
 
-im = imread('legionen.jpg');
+im = imread('./input/slov.jpg');
 h = size(im, 1);
 w = size(im, 2);
 im = im2double(im);
@@ -54,25 +54,15 @@ COLORS = 100;
 meanIntensity = floor(meanintensity(im_resize,DIM)*255);
 
 
-%% Choose 100 colors to cover color space
+%% Choose subset of colors to cover color space
 
 load('colors100.mat');
-
-% If recalculation is needed
-%colors100 = limitColorSpan100(LAB);
-
-%% Choose 50 less
-
-col50 = []
-for i = 1:2:100
-    col[i]
-end
-
-%% Choose 50 colors out of 100
-
 load('colors50.mat');
 
 % If recalculation is needed
+%[colors100, colors50] = limitColorSpan(LAB);
+
+% If recalculation is needed, another version of optimization
 %colors50 = limitColorSpan50(LAB, colors100);
 
 %% Choose only the most occuring colors in the image

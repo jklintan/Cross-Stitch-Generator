@@ -29,7 +29,7 @@ load('LAB.mat');
 
 %% Load input image
 
-im = imread('./input/mtdoom.jpg');
+im = imread('./input/legionen.jpg');
 h = size(im, 1);
 w = size(im, 2);
 im = im2double(im);
@@ -54,27 +54,15 @@ COLORS = 100;
 meanIntensity = floor(meanintensity(im_resize,DIM)*255);
 
 
-%% Choose 100 colors to cover color space
+%% Choose subset of colors to cover color space
 
 load('colors100.mat');
-
-% If recalculation is needed
-%colors100 = limitColorSpan100(LAB);
-
-%% Choose 50 less
-
-colors50_v2 = [];
-k = 1;
-for i = 1:2:100
-    col50_v2(k, 1) = colors100(i, 1);
-    k = k + 1;
-end
-
-%% Choose 50 colors out of 100
-
 load('colors50.mat');
 
 % If recalculation is needed
+%[colors100, colors50] = limitColorSpan(LAB);
+
+% If recalculation is needed, another version of optimization
 %colors50 = limitColorSpan50(LAB, colors100);
 
 %% Choose only the most occuring colors in the image
@@ -87,24 +75,19 @@ colors50optimized = findOptimalColors(meanIntensity, LAB, RGB);
 figure; imshow(finalimageFull);
 displayEmbroideryColors(buythis, buyFloss);
 
-%% Display image with 100 colors as database
+% Display image with 100 colors as database
 
 [finalimage100, buythis, buyFloss] = generateCrossStitchMosaic(H, W, meanIntensity, colors100, LAB, DIM, THICKNESS);
 figure; imshow(finalimage100);
 displayEmbroideryColors(buythis, buyFloss);
 
-%% Display image with 50 colors as database
+% Display image with 50 colors as database
 
 [finalimage50, buythis, buyFloss] = generateCrossStitchMosaic(H, W, meanIntensity, colors50, LAB, DIM, THICKNESS);
 figure; imshow(finalimage50);
 displayEmbroideryColors(buythis, buyFloss);
 
-
-[finalimage50_v2, buythis, buyFloss] = generateCrossStitchMosaic(H, W, meanIntensity, col50_v2, LAB, DIM, THICKNESS);
-figure; imshow(finalimage50_v2);
-displayEmbroideryColors(buythis, buyFloss);
-
-%% Display image with 50 most occuring colors as database
+% Display image with 50 most occuring colors as database
 
 [finalimage50opt, buythis, buyFloss] = generateCrossStitchMosaic(H, W, meanIntensity, colors50optimized, LAB, DIM, THICKNESS);
 figure; imshow(finalimage50opt);
@@ -140,10 +123,6 @@ dE_100 = (1/(W*H))*sum(sum(dE_100))
 crossLab = rgb2lab(finalimage50);
 dE_50 = sqrt((crossLab(:,:,1)-imLab(:,:,1)).^2 + (crossLab(:,:,2)-imLab(:,:,2)).^2 + (crossLab(:,:,3)-imLab(:,:,3)).^2);
 dE_50 = (1/(W*H))*sum(sum(dE_50))
-
-crossLab = rgb2lab(finalimage50_v2);
-dE_50_v2 = sqrt((crossLab(:,:,1)-imLab(:,:,1)).^2 + (crossLab(:,:,2)-imLab(:,:,2)).^2 + (crossLab(:,:,3)-imLab(:,:,3)).^2);
-dE_50_v2 = (1/(W*H))*sum(sum(dE_50_v2))
 
 crossLab = rgb2lab(finalimage50opt);
 dE_50opt = sqrt((crossLab(:,:,1)-imLab(:,:,1)).^2 + (crossLab(:,:,2)-imLab(:,:,2)).^2 + (crossLab(:,:,3)-imLab(:,:,3)).^2);
