@@ -41,7 +41,6 @@ DIM = 10; % Set to 10 or 20 for user to choose
 THICKNESS = 1; % Thickness 3 for DIM = 20, 1 for DIM = 10;
 H = 1080;
 W = 720;
-COLORS = 100;
 
 %% Resize input image
 
@@ -96,19 +95,12 @@ displayEmbroideryColors(buythis, buyFloss);
 
 %% Calculate quality measurements
 
-% Signal to noise ratio
-snr_distFull = snr(im_resize, im_resize-finalimageFull)
-snr_dist100 = snr(im_resize, im_resize-finalimage100)
-snr_dist50 = snr(im_resize, im_resize-finalimage50)
-snr_dist50opt = snr(im_resize, im_resize-finalimage50opt)
-
 % SSIM - structural similarity 
 % a perceptual metric that quantifies image quality degradation caused by processing
-[SSIMvalFull, SSIM] = ssim(im_resize, finalimageFull); SSIMvalFull
-[SSIMval100, SSIM] = ssim(im_resize, finalimage100); SSIMval100
-[SSIMval50, SSIM] = ssim(im_resize, finalimage50); SSIMval50
-[SSIMval50opt, SSIM] = ssim(im_resize, finalimage50opt); SSIMval50opt
-
+SSIMvalFull = ssim(im_resize, finalimageFull)
+SSIMval100 = ssim(im_resize, finalimage100)
+SSIMval50 = ssim(im_resize, finalimage50)
+SSIMval50opt = ssim(im_resize, finalimage50opt)
 
 % Euclidian distance
 imLab = rgb2lab(im_resize);
