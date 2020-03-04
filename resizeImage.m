@@ -15,11 +15,11 @@ end
 if(h > w) %Portrait image
     disp("Portrait image");
     if(h < H - 100 || w < W - 100)
-        disp("Input image is being enlarged, may suffer from pixelrelated distortions");
+        disp("Input image is being enlarged, may suffer from pixelated distortions");
     end
     
     if(h > H + 100 || w > W + 100)
-        disp("Input image is being shrunk");
+        disp("Input image is being shrunk, may suffer from loss of details");
     end
     
     portrait = 1;
@@ -32,11 +32,11 @@ elseif(h < w) % Landscape image
     
     disp("Landscape image");
     if(h < H - 100 || w < W - 100)
-        disp("Input image is being enlarged, may suffer from pixelrelated distortions");
+        disp("Input image is being enlarged, may suffer from pixelated distortions");
     end
     
     if(h > H + 100 || w > W + 100)
-        disp("Input image is being shrunk");
+        disp("Input image is being shrunk, may suffer from loss of details");
     end
     
     im_resize = imresize(im, [H, W], 'bicubic');
@@ -45,20 +45,14 @@ else %Square image
     
     disp("Square image");
     if(h < H - 100 || w < W - 100)
-        disp("Input image is being enlarged, may suffer from pixelrelated distortions");
+        disp("Input image is being enlarged, may suffer from pixelated distortions");
     end
     
     if(h > H + 100 || w > W + 100)
-        disp("Input image is being shrunk");
+        disp("Input image is being shrunk, may suffer from loss of details");
     end
     
     im_resize = imresize(im, [H, W], 'bicubic');
-end
-
-% Check if image is large enough
-if(h < 200 || w < 200)
-    disp("Input image is too small, choose a larger image");
-    return;
 end
 
 newH = H;
