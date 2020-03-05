@@ -21,15 +21,9 @@ load('LAB.mat');
 %If recalculation is needed
 %LAB = LabFromRGB(RGB);
 
-%Plot the color space for all DMC colors
-%plot3(LAB(:, 2), LAB(:, 3), LAB(:,1), 'r.')
-%grid on
-%title('All DMC colors in Lab color space')
-%xlabel('a value'); ylabel('b value'); zlabel('L value')
-
 %% Load input image
 
-im = imread('./input/legionen.jpg');
+im = imread('./input/mtdoom.jpg');
 h = size(im, 1);
 w = size(im, 2);
 im = im2double(im);
@@ -37,8 +31,8 @@ im = im2double(im);
 % 1080x720 (common aspect ratio for cameras) (long calculation time)
 % 540x360 quick but less accurate
 
-DIM = 10; % Set to 10 or 20 for user to choose
-THICKNESS = 1; % Thickness 3 for DIM = 20, 1 for DIM = 10;
+DIM = 20; % Set to 10 or 20 for user to choose
+THICKNESS = 3; % Thickness 3 for DIM = 20, 1 for DIM = 10;
 H = 1080;
 W = 720;
 
