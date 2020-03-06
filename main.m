@@ -31,8 +31,8 @@ im = im2double(im);
 % 1080x720 (common aspect ratio for cameras) (long calculation time)
 % 540x360 quick but less accurate
 
-DIM = 20; % Set to 10 or 20 for user to choose
-THICKNESS = 3; % Thickness 3 for DIM = 20, 1 for DIM = 10;
+DIM = 10; % Set to 10 or 20 for user to choose
+THICKNESS = 1; % Thickness 3 for DIM = 20, 1 for DIM = 10;
 H = 1080;
 W = 720;
 
@@ -80,7 +80,7 @@ displayEmbroideryColors(buythis, buyFloss);
 figure; imshow(finalimage50);
 displayEmbroideryColors(buythis, buyFloss);
 
-% Display image with 50 most occuring colors as database
+%Display image with 50 most occuring colors as database
 
 [finalimage50opt, buythis, buyFloss] = generateCrossStitchMosaic(H, W, meanIntensity, colors50optimized, LAB, DIM, THICKNESS);
 figure; imshow(finalimage50opt);
