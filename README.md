@@ -23,4 +23,4 @@ The following images has been generated with a cross stitch width of 10x10 pixel
 
 ## Illustration
 
-<img width="100%" src="./img/Fist50_opt.png"/>
+<img width="100%" src="./img/fist50.jpg"/>
