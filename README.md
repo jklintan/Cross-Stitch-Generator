@@ -13,7 +13,7 @@ The program reads in DMC color chart data from a csv-file (453 colors) and conve
 ## Optimization
 The reducement of the color space is performed according to maximizing the internal euclidean distance among the separate colors and thereby getting one subset of 100 colors and one subset of 50 colors to span the color space. The optimization according to input image has a slightly higher computational time as it counts the occurrences of colors in the input image before choosing the 50 most occurring to reproduce the image with. The result with the different optimizations can be seen below: 
 
-<img width="100%" src="./img/landscape.PNG"/>
+<img width="100%" src="./img/landscape.png"/>
 
 # Examples using the program
 
